@@ -1,7 +1,5 @@
 package org.example;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -44,47 +42,21 @@ public class Expression {
             strExpression = st;
         if (clearMap)
             variables.clear();
-        if (strExpression != null && strExpression!="")
+        if (strExpression != null && !strExpression.equals(""))
         {
             if(checkExpression(null))
             {
-                this.result = "";
-                this.index = -1;
-                //if (checkExpression())
-                //{
-                //    double meanExpression = calculationRecursion();
-                //    if (!this.result.equals("Error in calculation!"))
-                //        this.result = Double.toString(meanExpression);
-                //}
-                double meanExpression = 0;
+                result = "";
+                index = -1;
+                double meanExpression;
                 currentCh();
                 meanExpression = secondPriority();
-
-                //while (this.index < this.strExpression.length()  && !this.result.equals("Error in calculation!"))
-                //{
-                //    currentCh();
-                //System.out.println(ch);
-
-                //    meanExpression += secondPriority();
-                //}
-                if (this.result.equals(""))
+                if (result.equals(""))
                 {
-                    //System.out.println(meanExpression);
-                    //BigDecimal b = new BigDecimal(meanExpression, MathContext.DECIMAL64);
-                    //BigDecimal b = BigDecimal.valueOf(meanExpression);
-                    //System.out.println("------");
-                    //System.out.println(b.toString());
-                    //System.out.println("------");
-                    //result = b.toString();
-                    result = String.format("%.6f", meanExpression);
-                    //result = Double.toString(meanExpression);
+                    result = String.format("%.8f", meanExpression);
                     result = result.replaceAll(",", ".");
-                    //System.out.println("------");
-                    //System.out.println(result);
-                    //System.out.println("------");
                     double res = Double.parseDouble(result);
                     result = Double.toString(res);
-                    //result = BigDecimal.toString(meanExpression);
                 }
             }
             else
@@ -150,7 +122,6 @@ public class Expression {
                             previousCh();
                     }
                 }
-
             }
             else if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '^' || ch == '(')
             {
@@ -194,23 +165,19 @@ public class Expression {
         double x = calculation();
         for (;;)
         {
-            if (ch == '*')
+            if (ch == '*' && result.equals(""))
             {
                 currentCh();
                 x *= calculation();
-                //BigDecimal b = BigDecimal.valueOf(firstPriority());
-                //double d = b.doubleValue();
-                //x *= d;
             }
             else
-                if (ch == '/')
+                if (ch == '/' && result.equals(""))
                 {
                     currentCh();
                     double divider = calculation();
-                    //double divider = calculation();
                     if (divider!=0)
                         x /= divider;
-                    else
+                    else if (result.equals(""))
                         result = "Error in calculation (division by zero)!";
                 }
                 else
@@ -222,50 +189,34 @@ public class Expression {
         double x = firstPriority();
         for (;;)
         {
-            if (ch == '+')
+            if (ch == '+' && result.equals(""))
             {
                 currentCh();
                 x += firstPriority();
-                //BigDecimal b = BigDecimal.valueOf(firstPriority());
-                //double d = b.doubleValue();
-                //x += d;
             }
             else
-                if (ch == '-')
+                if (ch == '-' && result.equals(""))
                 {
                     currentCh();
                     x -= firstPriority();
-                    //BigDecimal b = BigDecimal.valueOf(firstPriority());
-                    //double d = b.doubleValue();
-                    //x -= d;
-
                 }
                 else
                     return x;
         }
     }
-//    private double calculationRecursion()
-//    {
-//        double x = calculation();
-//        return x;
-//    }
     private double calculation()
     {
-        //System.out.println(ch);
-        //System.out.println(index);
         if (ch == '+')
         {
             currentCh();
-            //return calculation();
-            return secondPriority();
+            return calculation();
+            //return secondPriority();
         }
         if (ch == '-')
         {
             currentCh();
-            //return (-1)*calculation();
-            //double res = secondPriority();
-            //return (-1.0)*res;
-            return -secondPriority();
+            return -calculation();
+            //return -secondPriority();
         }
         Double res = null;
         if (ch == '(')
@@ -280,30 +231,10 @@ public class Expression {
             {
                 currentCh();
             }
-
-
-//            else
-//            {
-//                currentCh();
-//                if (ch >= '0' && ch <= '9' || ch == '(' || ch >= 'a' && ch <= 'z')
-//                {
-//                    //System.out.println("mi tut");
-//                    //currentCh();
-//                    //res *= calculation();
-//                    //res *= secondPriority();
-//                    res *= calculation();
-//                }
-//            }
-
-
-
-
         }
         else
             if ((ch >= '0' && ch <= '9'))
-            //if ((ch >= '0' && ch <= '9') || ch =='.')
             {
-                //System.out.println("mi tut");
                 int startInd = this.index;
                 int numberpoint = 0;
                 while ((ch >= '0' && ch <= '9') || ch =='.')
@@ -316,27 +247,10 @@ public class Expression {
                     res = Double.parseDouble(this.strExpression.substring(startInd, this.index));
                 else
                 {
-                    result = "Error in calculation (incorrect number format)!";
+                    if (result.equals(""))
+                        result = "Error in calculation (incorrect number format)!";
                     res = 0.0;
                 }
-                //System.out.print("proneg res ");
-                //System.out.println(res);
-
-
-
-//                if (ch >= 'a' && ch <= 'z' || ch == '(')
-//                {
-//                    //currentCh();
-//                    res *= calculation();
-//                    //res *= secondPriority();
-//                }
-
-
-
-                //else if (ch =='^')
-                //{
-                //    res = Math.pow(res,calculation());
-                //}
             }
             else
                 if (ch >= 'a' && ch <= 'z')
@@ -347,71 +261,94 @@ public class Expression {
                     String function = this.strExpression.substring(startInd, this.index);
                     if (function.equals("sqrt"))
                     {
-                        res = Math.sqrt(calculation());
+                        double sq = calculation();
+                        //System.out.println(sq);
+                        if (sq>=0)
+                            res = Math.sqrt(sq);
+                        else
+                        {
+                            if (result.equals(""))
+                                result = "Error in calculation (the value in sqrt is less than 0)!";
+                            res = 0.0;
+                        }
                     }
                     else
                     {
                         if (function.length() == 4)
                             previousCh();
                         function = this.strExpression.substring(startInd, this.index);
-                        //System.out.println("--------");
-                        //System.out.println(function);
-                        //System.out.println(ch);
-                        //System.out.println("--------");
-                        if (function.equals("sin"))
-                            res = Math.sin(calculation());
-                        else if (function.equals("cos"))
-                            res = Math.cos(calculation());
-                        else if (function.equals("tan"))
-                            res = Math.tan(calculation());
-                        else if (function.equals("abs"))
-                            res = Math.abs(calculation());
-                        else {
-                            this.index = startInd;
-                            ch = this.strExpression.charAt(this.index);
-                            double currentVariable = 0.0;
-                            //Scanner in = new Scanner(System.in);
-                            //currentVariable = in.nextDouble();
 
-                            if (variables.containsKey(ch)) {
-                                currentVariable = (double) variables.get(ch);
-                                //System.out.print("Value "+ch+" -> ");
-                                //System.out.println(currentVariable);
-                            } else {
-                                Scanner in = new Scanner(System.in);
-                                System.out.print("Value " + ch + " -> ");
-                                currentVariable = in.nextDouble();
-                                setVariable(ch, currentVariable);
-                                //variables.put(ch,currentVariable);
-                            }
-                            //System.out.print(currentVariable);
-                            res = currentVariable;
-                            currentCh();
-
-
-//                                                if (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'z' || ch == '(')
-//                                                {
-//                                                    //currentCh();
-//                                                    res *= calculation();
-//                                                }
-
-
-                            //else if (ch =='^')
-                            //{
-                            //    res = Math.pow(res,calculation());
-                            //}
+                        switch (function)
+                        {
+                            case "sin":
+                                res = Math.sin(calculation());
+                                break;
+                            case "cos":
+                                res = Math.cos(calculation());
+                                break;
+                            case "tan":
+                                res = Math.tan(calculation());
+                                break;
+                            case "abs":
+                                res = Math.abs(calculation());
+                                break;
+                            default:
+                                this.index = startInd;
+                                ch = this.strExpression.charAt(this.index);
+                                double currentVariable;
+                                if (variables.containsKey(ch))
+                                {
+                                    currentVariable = (double) variables.get(ch);
+                                }
+                                else
+                                {
+                                    Scanner in = new Scanner(System.in);
+                                    System.out.print("Value " + ch + " -> ");
+                                    currentVariable = in.nextDouble();
+                                    setVariable(ch, currentVariable);
+                                }
+                                res = currentVariable;
+                                currentCh();
+                                break;
                         }
+
+//                        if (function.equals("sin"))
+//                            res = Math.sin(calculation());
+//                        else if (function.equals("cos"))
+//                            res = Math.cos(calculation());
+//                        else if (function.equals("tan"))
+//                            res = Math.tan(calculation());
+//                        else if (function.equals("abs"))
+//                            res = Math.abs(calculation());
+//                        else {
+//                            this.index = startInd;
+//                            ch = this.strExpression.charAt(this.index);
+//                            double currentVariable;
+//                            if (variables.containsKey(ch))
+//                            {
+//                                currentVariable = (double) variables.get(ch);
+//                            }
+//                            else
+//                            {
+//                                Scanner in = new Scanner(System.in);
+//                                System.out.print("Value " + ch + " -> ");
+//                                currentVariable = in.nextDouble();
+//                                setVariable(ch, currentVariable);
+//                            }
+//                            res = currentVariable;
+//                            currentCh();
+//                        }
                     }
                 }
-        if (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'z' || ch == '(' || ch == '.' || ch == ',')
+        if (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'z' || ch == '(')// || ch == '.' || ch == ',')
         {
             //currentCh();
-            if (ch == '.' || ch == ',')
-            {
-                result = "Error in calculation (incorrect expression format)!";
-                res = 0.0;
-            }
-            else
+//            if (ch == '.' || ch == ',')
+//            {
+//                result = "Error in calculation (incorrect expression format)!";
+//                res = 0.0;
+//            }
+//            else
                 res *= calculation();
         }
         if (ch =='^')
@@ -420,17 +357,18 @@ public class Expression {
             double degree = calculation();
             if (res<0 && degree <1)
             {
-                result = "Error in calculation (it is impossible to raise to a degree)!";
+                if (result.equals(""))
+                    result = "Error in calculation (it is impossible to raise to a degree)!";
                 res = 0.0;
             }
             else
-                res = Math.pow(res,calculation());
+                res = Math.pow(res,degree);
         }
-        if (res == null)
-        {
-            result = "Error in calculation (incorrect expression format)!";
-            res = 0.0;
-        }
+//        if (res == null)
+//        {
+//            result = "Error in calculation (incorrect expression format)!";
+//            res = 0.0;
+//        }
         return res;
     }
 }
