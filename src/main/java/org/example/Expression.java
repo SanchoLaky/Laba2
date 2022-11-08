@@ -4,38 +4,83 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+/**
+ * Mathematical expressions class
+ */
 public class Expression {
-    private String strExpression, result;
+    /**
+     * Mathematical expression in the form of a string
+     */
+    private String strExpression;
+    /**
+     * The value of a mathematical expression (or the type of error) in the form of a string
+     */
+    private String result;
+    /**
+     * Index of the current character
+     */
     private int index;
+    /**
+     * Current symbol
+     */
     private char ch;
+    /**
+     * Dictionary of Values of variables in the form Map
+     */
     private Map variables;
-
-    private void currentCh()
-    {
-        this.ch = ++this.index < this.strExpression.length() ? this.strExpression.charAt(this.index) : '@';
-        //System.out.println(ch);
-    }
-    private void previousCh()
-    {
-        this.ch = --this.index >= 0 ? this.strExpression.charAt(this.index) : '@';
-        //System.out.println(ch);
-    }
     public Expression (String str)
     {
         this.strExpression = str;
         this.index =-1;
         variables = new HashMap<>();
     }
+    public Expression ()
+    {
+        this.strExpression = "";
+        this.index =-1;
+        variables = new HashMap<>();
+    }
+    /**
+     * The method shifts the index of the current character to the right by 1 and changes the current character
+     */
+    private void currentCh()
+    {
+        this.ch = ++this.index < this.strExpression.length() ? this.strExpression.charAt(this.index) : '@';
+        //System.out.println(ch);
+    }
+    /**
+     * The method shifts the index of the current character to the left by 1 and changes the current character
+     */
+    private void previousCh()
+    {
+        this.ch = --this.index >= 0 ? this.strExpression.charAt(this.index) : '@';
+        //System.out.println(ch);
+    }
 
+    /**
+     * The method adds (modifies) the value of the variable
+     * @param key name of the variable to be added (modified)
+     * @param value value of the variable to be added (modified)
+     */
     public void setVariable(char key, double value)
     {
         variables.put(key,value);
     }
-
+    /**
+     * The method calculates the value of a mathematical expression
+     * written in the class after clearing the dictionary of variables
+     * @return the calculated expression or the type of the first error that occurred during the calculation
+     */
     public String calculateExpression ()
     {
         return calculateExpression(null, true);
     }
+    /**
+     * The method calculates the value of the mathematical expression passed to the function
+     * @param st mathematical expression to be calculated
+     * @param clearMap is true if you need to clear the dictionary of variables already in the class
+     * @return the calculated expression or the type of the first error that occurred during the calculation
+     */
     public String calculateExpression (String st, boolean clearMap)
     {
         if (st!=null)
@@ -66,6 +111,11 @@ public class Expression {
             result = "The expression is not set!";
         return this.result;
     }
+    /**
+     * The method checks (and places in the class) the mathematical expression passed to the function for syntax errors
+     * @param str mathematical expression to check
+     * @return is true if the mathematical expression being tested does not contain syntax errors
+     */
     public boolean checkExpression(String str)
     {
         if (str!=null)
@@ -160,6 +210,14 @@ public class Expression {
             res = false;
         return res;
     }
+    /**
+     * The method checks the mathematical expression written in the class for syntax errors
+     * @return is true if the mathematical expression being tested does not contain syntax errors
+     */
+    public boolean checkExpression()
+    {
+        return checkExpression(null);
+    }
     private double firstPriority()
     {
         double x = calculation();
@@ -210,27 +268,18 @@ public class Expression {
         {
             currentCh();
             return calculation();
-            //return secondPriority();
         }
         if (ch == '-')
         {
             currentCh();
             return -calculation();
-            //return -secondPriority();
         }
         Double res = null;
         if (ch == '(')
         {
             currentCh();
             res = secondPriority();
-            if (ch != ')')
-            {
-                result = "Error in calculation (Missing ')' )!";
-            }
-            else
-            {
-                currentCh();
-            }
+            currentCh();
         }
         else
             if ((ch >= '0' && ch <= '9'))
@@ -262,7 +311,6 @@ public class Expression {
                     if (function.equals("sqrt"))
                     {
                         double sq = calculation();
-                        //System.out.println(sq);
                         if (sq>=0)
                             res = Math.sqrt(sq);
                         else
@@ -311,46 +359,10 @@ public class Expression {
                                 currentCh();
                                 break;
                         }
-
-//                        if (function.equals("sin"))
-//                            res = Math.sin(calculation());
-//                        else if (function.equals("cos"))
-//                            res = Math.cos(calculation());
-//                        else if (function.equals("tan"))
-//                            res = Math.tan(calculation());
-//                        else if (function.equals("abs"))
-//                            res = Math.abs(calculation());
-//                        else {
-//                            this.index = startInd;
-//                            ch = this.strExpression.charAt(this.index);
-//                            double currentVariable;
-//                            if (variables.containsKey(ch))
-//                            {
-//                                currentVariable = (double) variables.get(ch);
-//                            }
-//                            else
-//                            {
-//                                Scanner in = new Scanner(System.in);
-//                                System.out.print("Value " + ch + " -> ");
-//                                currentVariable = in.nextDouble();
-//                                setVariable(ch, currentVariable);
-//                            }
-//                            res = currentVariable;
-//                            currentCh();
-//                        }
                     }
                 }
         if (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'z' || ch == '(')// || ch == '.' || ch == ',')
-        {
-            //currentCh();
-//            if (ch == '.' || ch == ',')
-//            {
-//                result = "Error in calculation (incorrect expression format)!";
-//                res = 0.0;
-//            }
-//            else
-                res *= calculation();
-        }
+            res *= calculation();
         if (ch =='^')
         {
             currentCh();
@@ -364,11 +376,34 @@ public class Expression {
             else
                 res = Math.pow(res,degree);
         }
-//        if (res == null)
-//        {
-//            result = "Error in calculation (incorrect expression format)!";
-//            res = 0.0;
-//        }
         return res;
+    }
+    /**
+     * The method set new mathematical expression in class
+     * @param strExpression new mathematical expression
+     */
+    public void setStrExpression(String strExpression) {
+        this.strExpression = strExpression;
+    }
+    /**
+     * The method set new Dictionary of Values of variables in class
+     * @param variables new Dictionary of Values of variables
+     */
+    public void setVariables(Map variables) {
+        this.variables = variables;
+    }
+    /**
+     * The method return Dictionary of Values of variables stored in a class
+     * @return Dictionary of Values of variables stored in a class
+     */
+    public Map getVariables() {
+        return variables;
+    }
+    /**
+     * The method return mathematical expression stored in a class
+     * @return mathematical expression stored in a class
+     */
+    public String getStrExpression() {
+        return strExpression;
     }
 }
