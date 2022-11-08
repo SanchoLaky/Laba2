@@ -69,7 +69,7 @@ public class Expression {
     /**
      * The method calculates the value of a mathematical expression
      * written in the class after clearing the dictionary of variables
-     * @return the calculated expression or the type of the first error that occurred during the calculation
+     * @return the calculated expression (8 decimal places) or the type of the first error that occurred during the calculation
      */
     public String calculateExpression ()
     {
@@ -79,7 +79,7 @@ public class Expression {
      * The method calculates the value of the mathematical expression passed to the function
      * @param st mathematical expression to be calculated
      * @param clearMap is true if you need to clear the dictionary of variables already in the class
-     * @return the calculated expression or the type of the first error that occurred during the calculation
+     * @return the calculated expression (8 decimal places) or the type of the first error that occurred during the calculation
      */
     public String calculateExpression (String st, boolean clearMap)
     {
@@ -218,6 +218,11 @@ public class Expression {
     {
         return checkExpression(null);
     }
+    /**
+     * The method performs recursive descent on the expression (while maintaining the priority of operations)
+     * by calculating the product and quotient of already calculated expressions
+     * @return calculated value
+     */
     private double firstPriority()
     {
         double x = calculation();
@@ -242,6 +247,11 @@ public class Expression {
                     return x;
         }
     }
+    /**
+     * The method performs recursive descent on the expression (while maintaining the priority of operations)
+     * by calculating the sum and difference of already calculated expressions
+     * @return calculated value
+     */
     private double secondPriority()
     {
         double x = firstPriority();
@@ -262,6 +272,10 @@ public class Expression {
                     return x;
         }
     }
+    /**
+     * The method calculates the value of the expression starting from the current index
+     * @return calculated value (if it is impossible to calculate, it will write the error type in the result and return 0.0)
+     */
     private double calculation()
     {
         if (ch == '+')
